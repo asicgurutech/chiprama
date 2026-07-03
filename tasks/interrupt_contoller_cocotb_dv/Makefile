@@ -1,6 +1,8 @@
 SHELL := /bin/bash
 
-PYTHON ?= python3
+#PYTHON ?= python3
+VENV_DIR := cocotb_env
+PYTHON ?= $(VENV_DIR)/bin/python3
 RTL ?= rtl/interrupt_controller.sv
 FILELIST ?= filelist.f
 TESTS ?= dv/cocotb/test_interrupt_controller.py
