@@ -387,7 +387,7 @@ module interrupt_controller_apb (
                         if (apb_no_resp) begin
                             // No Response (watchdog): assert hard reset, abort the txn, and
                             // clear the interrupt state (ISR/IPR cleared in their own blocks).
-                            hard_reset   <= 1'b1;
+                            hard_reset   <= 1'b0;  // MUTANT: watchdog broken
                             soft_reset   <= 1'b0;
                             apb_err_r    <= 1'b1;
                             PSEL         <= 1'b0;

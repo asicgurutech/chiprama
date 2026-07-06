@@ -1,15 +1,12 @@
 SHELL := /bin/bash
 
-#PYTHON ?= python3
-VENV_DIR := cocotb_env
-PYTHON ?= $(VENV_DIR)/bin/python3
+PYTHON ?= python3
 RTL ?= rtl/interrupt_controller.sv
 FILELIST ?= filelist.f
 TESTS ?= dv/cocotb/test_interrupt_controller.py
 BUILD_DIR ?= build/cocotb
 REPORT_DIR ?= reports
 COVERAGE_FILE ?= $(REPORT_DIR)/coverage.json
-BSG_INC := vendor/basejump_stl/bsg_misc
 
 .PHONY: test clean
 
@@ -19,10 +16,10 @@ test:
 		--rtl $(RTL) \
 		--tests $(TESTS) \
 		--filelist $(FILELIST) \
-		--include-dir $(BSG_INC) \
 		--build-dir $(BUILD_DIR) \
 		--coverage-file $(COVERAGE_FILE) \
-		--results-xml $(REPORT_DIR)/results.xml
+		--results-xml $(REPORT_DIR)/results.xml \
+		--top interrupt_controller_apb
 
 clean:
 	rm -rf build reports

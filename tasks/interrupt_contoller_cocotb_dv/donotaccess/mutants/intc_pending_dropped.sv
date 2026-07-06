@@ -231,7 +231,7 @@ module interrupt_controller_apb (
     wire issue_new       = gie && priority_valid && isr_empty;
     wire [7:0] prio_hot  = 8'h01 << priority_vect;
 
-    assign ipr_clear = issue_new ? prio_hot : 8'h00;
+    assign ipr_clear = prio_hot;  // MUTANT
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin

@@ -374,7 +374,7 @@ module interrupt_controller_apb (
                         PWRITE    <= 1'b0;
 
                         if (PSLVERR) begin
-                            apb_err_r <= 1'b1;   // Latch slave error
+                            apb_err_r <= 1'b0;   // MUTANT
                         end
 
                         apb_wait_cnt <= 16'd0;

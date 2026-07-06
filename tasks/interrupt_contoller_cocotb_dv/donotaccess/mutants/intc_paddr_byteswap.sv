@@ -354,7 +354,7 @@ module interrupt_controller_apb (
                     PSEL    <= 1'b1;
                     PENABLE <= 1'b0;
                     PWRITE  <= 1'b1;
-                    PADDR   <= {maddr_hi, maddr_lo};
+                    PADDR   <= {maddr_lo, maddr_hi};  // MUTANT
                     PWDATA  <= apb_data_latch;  // ISR is the message payload
                     apb_wait_cnt <= 16'd0;      // start timing the access phase
                     soft_reset   <= 1'b0;

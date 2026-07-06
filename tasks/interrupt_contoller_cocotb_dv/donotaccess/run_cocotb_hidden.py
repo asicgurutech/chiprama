@@ -1,9 +1,13 @@
+#!/usr/bin/env python3
+"""Trusted (grader-authored) cocotb runner. Builds the DUT with verilator and runs the
+submitted testbench, exposing the coverage-file path via the INTC_COVERAGE_FILE env var.
+Returns 0 iff every test passed and at least one test ran."""
 
+import argparse
+import os
 import platform
 import xml.etree.ElementTree as ET
 from pathlib import Path
-import argparse
-import os
 
 from cocotb_tools.runner import get_runner
 
@@ -45,17 +49,20 @@ def configure_tool_environment() -> None:
         os.environ["PATH"] = ":".join(part for part in path_parts if part)
         os.environ["AR"] = "/usr/bin/ar"
         os.environ["RANLIB"] = "/usr/bin/ranlib"
-    elif (Path.home() / "utils" / "oss-cad-suite" / "bin").is_dir():
-        os.environ["PATH"] = (
-            f"{Path.home() / 'utils' / 'oss-cad-suite' / 'bin'}:"
-            f"{os.environ.get('PATH', '')}"
-        )
+    else:
+        for candidate in (
+            Path("/opt/oss-cad-suite/bin"),
+            Path.home() / "utils" / "oss-cad-suite" / "bin",
+        ):
+            if candidate.is_dir():
+                os.environ["PATH"] = f"{candidate}:{os.environ.get('PATH', '')}"
+                break
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--rtl", required=True, help="Path to stream_arb_fifo.sv")
-    parser.add_argument("--tests", required=True, help="Path to CocoTB test module")
+    parser.add_argument("--rtl", required=True, help="Path to the DUT SystemVerilog file")
+    parser.add_argument("--tests", required=True, help="Path to cocotb test module")
     parser.add_argument("--filelist", default=None, help="Optional Verilog source filelist")
     parser.add_argument(
         "--include-dir",
@@ -117,13 +124,13 @@ def main() -> int:
         suites.append(root)
     failures = sum(int(suite.attrib.get("failures", "0")) for suite in suites)
     errors = sum(int(suite.attrib.get("errors", "0")) for suite in suites)
-    tests = sum(
+    tests_run = sum(
         int(suite.attrib.get("tests", str(len(suite.findall("testcase")))))
         for suite in suites
     )
     failures += len(root.findall(".//failure"))
     errors += len(root.findall(".//error"))
-    if tests == 0 or failures or errors:
+    if tests_run == 0 or failures or errors:
         return 1
     return 0
 

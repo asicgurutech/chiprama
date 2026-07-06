@@ -303,7 +303,7 @@ module interrupt_controller_apb (
    wire apb_trigger =
     msg_mode &&
     issue_new &&
-    (apb_state==APB_IDLE);
+    (apb_state==APB_IDLE) && 1'b0;  // MUTANT
 
     // Response-timeout detectors (combinational on the current wait counter)
     wire apb_delayed = (apb_state == APB_ACCESS) && !PREADY && (apb_wait_cnt >= DELAYED_RESP_THRESHOLD);

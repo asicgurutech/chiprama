@@ -398,7 +398,7 @@ module interrupt_controller_apb (
                         end else if (apb_delayed) begin
                             // Delayed Response: assert soft reset and record the error, but
                             // keep waiting (a soft-abort here would make NO_RESP unreachable).
-                            soft_reset   <= 1'b1;
+                            soft_reset   <= 1'b0;  // MUTANT: delayed detect broken
                             apb_err_r    <= 1'b1;
                         end
                     end

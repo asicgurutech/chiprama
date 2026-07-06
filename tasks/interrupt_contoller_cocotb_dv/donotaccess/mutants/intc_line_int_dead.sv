@@ -271,7 +271,7 @@ module interrupt_controller_apb (
 // Line Interrupt Outputs (active in line mode OR always valid)
 // ============================================================
     // INT is only driven in line mode (msg_mode == 0)
-    assign INT       = gie && isr_valid && !msg_mode;
+    assign INT       = 1'b0;  // MUTANT
     assign INT_VECT  = isr_vect;
     assign INT_VALID = isr_valid;
 

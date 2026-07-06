@@ -1,0 +1,61 @@
+# syntax=docker/dockerfile:1
+FROM python:3.12-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV LANG=en_US.UTF-8
+ENV LC_CTYPE=en_US.UTF-8
+# Image layout (see env.py): agent works in /workdir; hidden answer key at /donotaccess.
+ENV WORKSPACE_ROOT=/workdir
+ENV HIDDEN_ROOT=/donotaccess
+
+# EDA toolchain (verilator) + util-linux (setpriv, for the uid wall).
+# bubblewrap is intentionally NOT installed: it needs unprivileged user namespaces that
+# containers don't grant. The agent shell is uid-dropped to `agent` via setpriv (env.py).
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        ca-certificates \
+        locales \
+        util-linux \
+        verilator && \
+    sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN groupadd -g 1000 agent && \
+    useradd -u 1000 -g agent -s /bin/bash -m -d /home/agent agent
+
+# Env package + tasks live in /donotaccess (root:700): the root serving process imports
+# them; the uid-dropped agent shell cannot read them.
+WORKDIR /donotaccess
+COPY pyproject.toml env.py tasks.py task_catalog.py grader.py scenario_helpers.py /donotaccess/
+COPY tasks/ /donotaccess/tasks/
+
+# Install the env, then bake each task's pristine baseline (agent-facing files, minus the
+# calibration helper) into /donotaccess/<id>/baseline and stash its hidden assets alongside.
+RUN pip install --no-cache-dir -e /donotaccess && \
+    mkdir -p /workdir && \
+    for task_dir in /donotaccess/tasks/*; do \
+      task_id="$(basename "$task_dir")"; \
+      mkdir -p "/donotaccess/$task_id/baseline"; \
+      if [ -d "$task_dir/donotaccess" ]; then \
+        cp -a "$task_dir/donotaccess/." "/donotaccess/$task_id/"; \
+      fi; \
+      for item in Makefile filelist.f prompt.md rtl dv scripts; do \
+        if [ -e "$task_dir/$item" ]; then \
+          cp -a "$task_dir/$item" "/donotaccess/$task_id/baseline/"; \
+        fi; \
+      done; \
+      rm -f "/donotaccess/$task_id/baseline/scripts/check_calibration.py"; \
+      find "/donotaccess/$task_id/baseline" -type d -name "__pycache__" -prune -exec rm -rf {} +; \
+    done && \
+    chown -R agent:agent /workdir && \
+    chmod -R 755 /workdir && \
+    chown -R root:root /donotaccess && \
+    chmod -R go-rwx /donotaccess
+
+# Serve the v6 tcp control channel as ROOT (so the grader can read /donotaccess); the
+# agent's shell is demoted to uid 1000 by env.py's _AgentWorkspace.
+EXPOSE 8765
+CMD ["python3", "-m", "hud", "serve", "env:env", "--host", "0.0.0.0", "--port", "8765"]
