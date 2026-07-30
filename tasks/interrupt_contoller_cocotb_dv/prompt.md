@@ -24,6 +24,19 @@ slave model, and self-checking assertions covering:
 - **apb_no_response_reset** — when an APB access phase stays unanswered beyond the no-response
   threshold (2000 clocks), the `hard_reset` watchdog output asserts and the stuck interrupt is
   abandoned.
+- **irq_priority_order** — when two or more IRQ sources are simultaneously pending, the
+  fixed-priority encoder services the lowest-numbered (highest-priority) source first (e.g.
+  IRQ0 over IRQ1).
+- **irq_masking** — a channel masked in `IMR` does not become pending or fire, even while its
+  `irq` line is active.
+- **edge_level_trigger** — `TRIG` selects edge (`1`) vs. level (`0`) triggering per channel: an
+  edge-triggered source fires once per rising edge, while a level-triggered source held high
+  re-triggers on its own after being acknowledged, without a new edge.
+- **ipr_set_ack_race** — a new IRQ becoming pending in the same clock cycle as an unrelated CPU
+  write to `IPR` (W1C) is preserved, not silently dropped by the write.
+- **apb_threshold_boundary** — `soft_reset` asserts in the same clock the APB access-phase wait
+  count first reaches the documented delayed-response threshold (500), not one clock later or
+  earlier.
 
 Mark each verified scenario by calling `mark_coverage("<point>")` with the exact names above.
 The register map, APB FSM behavior, and signal names are described in `README.md` and the RTL

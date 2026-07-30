@@ -5,7 +5,7 @@ description = "HUD v6 chip-design environment (interrupt_controller_apb cocotb D
 requires-python = ">=3.11,<3.13"
 dependencies = [
     "cocotb==2.0.1",
-    "hud-python[agents]>=0.6.5",
+    "hud[agents]>=0.6.5",
     "pydantic>=2.0.0",
 ]
 

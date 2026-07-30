@@ -66,6 +66,11 @@ REQUIRED_COVERAGE = [
     "pending_irq_during_apb",
     "apb_delayed_reset",
     "apb_no_response_reset",
+    "irq_priority_order",
+    "irq_masking",
+    "edge_level_trigger",
+    "ipr_set_ack_race",
+    "apb_threshold_boundary",
 ]
 MUTANTS = [
     "intc_line_int_dead.sv",
@@ -76,6 +81,11 @@ MUTANTS = [
     "intc_pending_dropped.sv",
     "intc_no_soft_reset.sv",
     "intc_no_wdt_hard_reset.sv",
+    "intc_priority_swapped.sv",
+    "intc_mask_bypassed.sv",
+    "intc_trig_mode_stuck.sv",
+    "intc_ipr_new_irq_race.sv",
+    "intc_soft_reset_offbyone.sv",
 ]
 
 
@@ -147,51 +157,109 @@ def run(args: list[str], *, cwd: Path, timeout: int = 180) -> subprocess.Complet
 
 
 def run_cocotb(hidden_root: Path, rtl: Path, tests: Path, label: str) -> dict[str, object]:
-    with tempfile.TemporaryDirectory(prefix=f"intc-dv-{label}-") as td:
-        work = Path(td)
-        rtl_copy = work / DUT_BASENAME
-        test_dir = work / "tests"
-        test_dir.mkdir()
+    """Run the submitted testbench against `rtl`.
+
+    Split into two isolated stages so the testbench never gets read access to the DUT
+    source (golden or mutant), and so nothing about the working directories differs
+    between a golden run and a mutant run:
+
+      1. build (trusted): compiles `rtl` with verilator in a directory that is never
+         chowned to the agent uid and is torn down at the end of this function. Runs at
+         the grader's own privilege (root in the deployed image), NOT uid-dropped, since
+         the compiler needs to read the DUT source.
+      2. test (agent-visible): only the compiled simulation executable - not the .sv
+         source, not the generated C++ - is copied into a second, generically-named
+         directory, which is then chowned to the agent uid and used to run the submitted
+         testbench uid-dropped. The executable is self-contained (verilator's `test()`
+         step just execs it - see cocotb_tools.runner.Verilator._test_command), so no
+         DUT source or transpiled logic is ever reachable from this stage.
+
+    Directory prefixes deliberately carry no DUT-identity information (never `label`), so
+    a golden run and a mutant run are structurally indistinguishable to code running
+    inside them (cwd, INTC_COVERAGE_FILE, results/coverage paths, permissions all match).
+    """
+    with tempfile.TemporaryDirectory(prefix="intc-dv-build-") as build_td:
+        build_root = Path(build_td)
+        rtl_copy = build_root / DUT_BASENAME
         shutil.copy2(rtl, rtl_copy)
-        shutil.copy2(tests, test_dir / "test_interrupt_controller.py")
-        coverage = work / "coverage.json"
-        results = work / "results.xml"
-        # The trusted hidden runner lives in /donotaccess (root:700) which uid 1000 cannot
-        # read; stage a copy into the work dir so the dropped interpreter can load it. The
-        # runner is grader-authored (trusted); only the testbench it imports is agent code.
-        runner = work / "run_cocotb_hidden.py"
-        shutil.copy2(hidden_root / "run_cocotb_hidden.py", runner)
-        # Hand the staged work dir to uid 1000 so the dropped subprocess can read the DUT
-        # copy + runner and write build/coverage/results, while walled out of /donotaccess.
-        _chown_tree_to_agent(work)
-        result = run(
+        build_runner = build_root / "run_cocotb_hidden.py"
+        shutil.copy2(hidden_root / "run_cocotb_hidden.py", build_runner)
+        sim_build_dir = build_root / "sim_build"
+
+        build_result = run(
             [
-                *_drop,
                 sys.executable,
-                str(runner),
+                str(build_runner),
+                "--stage", "build",
                 "--rtl", str(rtl_copy),
-                "--tests", str(test_dir / "test_interrupt_controller.py"),
                 "--top", TOP,
-                "--build-dir", str(work / "build"),
-                "--coverage-file", str(coverage),
-                "--results-xml", str(results),
+                "--build-dir", str(sim_build_dir),
             ],
-            cwd=work,
+            cwd=build_root,
             timeout=180,
         )
-        coverage_data: dict[str, bool] = {}
-        if coverage.exists():
-            try:
-                coverage_data = json.loads(coverage.read_text(encoding="utf-8"))
-            except json.JSONDecodeError:
-                coverage_data = {}
-        return {
-            "label": label,
-            "passed": result.returncode == 0,
-            "returncode": result.returncode,
-            "coverage": coverage_data,
-            "log": result.stdout[-6000:],
-        }
+        compiled_sim = sim_build_dir / TOP
+        if build_result.returncode != 0 or not compiled_sim.exists():
+            return {
+                "label": label,
+                "passed": False,
+                "returncode": build_result.returncode or 1,
+                "coverage": {},
+                "log": build_result.stdout[-6000:],
+            }
+
+        with tempfile.TemporaryDirectory(prefix="intc-dv-run-") as run_td:
+            run_root = Path(run_td)
+            test_dir = run_root / "tests"
+            test_dir.mkdir()
+            shutil.copy2(tests, test_dir / "test_interrupt_controller.py")
+            run_build_dir = run_root / "build"
+            run_build_dir.mkdir()
+            # Only the compiled binary crosses into the agent-visible tree - no .sv source,
+            # no verilator-generated C++.
+            shutil.copy2(compiled_sim, run_build_dir / TOP)
+            (run_build_dir / TOP).chmod(0o755)
+            coverage = run_root / "coverage.json"
+            results = run_root / "results.xml"
+            # The trusted hidden runner lives in /donotaccess (root:700) which uid 1000
+            # cannot read; stage a copy into the run dir so the dropped interpreter can
+            # load it. The runner is grader-authored (trusted); only the testbench it
+            # imports is agent code.
+            test_runner = run_root / "run_cocotb_hidden.py"
+            shutil.copy2(hidden_root / "run_cocotb_hidden.py", test_runner)
+
+            # Hand the staged run dir to uid 1000 so the dropped subprocess can read the
+            # compiled sim + runner and write coverage/results, while walled out of the
+            # build dir (which holds the DUT source and is about to be torn down anyway).
+            _chown_tree_to_agent(run_root)
+            result = run(
+                [
+                    *_drop,
+                    sys.executable,
+                    str(test_runner),
+                    "--stage", "test",
+                    "--tests", str(test_dir / "test_interrupt_controller.py"),
+                    "--top", TOP,
+                    "--build-dir", str(run_build_dir),
+                    "--coverage-file", str(coverage),
+                    "--results-xml", str(results),
+                ],
+                cwd=run_root,
+                timeout=180,
+            )
+            coverage_data: dict[str, bool] = {}
+            if coverage.exists():
+                try:
+                    coverage_data = json.loads(coverage.read_text(encoding="utf-8"))
+                except json.JSONDecodeError:
+                    coverage_data = {}
+            return {
+                "label": label,
+                "passed": result.returncode == 0,
+                "returncode": result.returncode,
+                "coverage": coverage_data,
+                "log": result.stdout[-6000:],
+            }
 
 
 def hygiene_score(testbench: Path) -> dict[str, object]:

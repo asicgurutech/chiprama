@@ -46,6 +46,11 @@ COVERAGE_POINTS = [
     "pending_irq_during_apb",
     "apb_delayed_reset",
     "apb_no_response_reset",
+    "irq_priority_order",
+    "irq_masking",
+    "edge_level_trigger",
+    "ipr_set_ack_race",
+    "apb_threshold_boundary",
 ]
 
 
@@ -589,3 +594,190 @@ async def test_13_apb_no_response_hard_reset(dut):
     assert isr_val == 0x00, f"ISR should be cleared by the watchdog, got 0x{isr_val:02X}"
 
     mark_coverage("apb_no_response_reset")
+
+
+# ─────────────────────────────────────────────────────────────
+# T14: Fixed-priority arbitration — IRQ0 wins over IRQ1 when both pending
+# ─────────────────────────────────────────────────────────────
+@cocotb.test()
+async def test_14_irq_priority_order(dut):
+    cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
+    await reset_dut(dut)
+    slave = APBSlaveModel(dut, ready_latency=1)
+    cocotb.start_soon(slave.start())
+
+    await cpu_write(dut, ADDR_TRIG, 0xFF)
+    await cpu_write(dut, ADDR_IMR, 0xFC)   # unmask IRQ0 and IRQ1
+    await cpu_write(dut, ADDR_GCR, 0x01)
+    await cpu_write(dut, ADDR_MADDR_LO, 0x00)
+    await cpu_write(dut, ADDR_MADDR_HI, 0x00)
+    await cpu_write(dut, ADDR_MICR, 0x01)
+
+    await fire_irq_edge(dut, 0x03)          # IRQ0 and IRQ1 pending in the same cycle
+    await wait_for_txns(dut, slave, 1, timeout=40)
+
+    txn = slave.last_transaction()
+    assert txn is not None, "no APB txn recorded"
+    assert txn["data"] == 0x01, \
+        f"IRQ0 (highest priority) should be serviced first, got PWDATA=0x{txn['data']:02X}"
+
+    isr_val = await cpu_read(dut, ADDR_ISR)
+    assert isr_val == 0x01, f"ISR expected 0x01 for IRQ0, got 0x{isr_val:02X}"
+
+    ipr_val = await cpu_read(dut, ADDR_IPR)
+    assert ipr_val == 0x02, f"IRQ1 should remain pending behind IRQ0, got IPR=0x{ipr_val:02X}"
+
+    slave.stop()
+    mark_coverage("irq_priority_order")
+
+
+# ─────────────────────────────────────────────────────────────
+# T15: A masked IRQ never becomes pending or fires
+# ─────────────────────────────────────────────────────────────
+@cocotb.test()
+async def test_15_irq_masking(dut):
+    cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
+    await reset_dut(dut)
+    slave = APBSlaveModel(dut, ready_latency=1)
+    cocotb.start_soon(slave.start())
+
+    await cpu_write(dut, ADDR_TRIG, 0xFF)
+    await cpu_write(dut, ADDR_IMR, 0xFF)   # everything masked
+    await cpu_write(dut, ADDR_GCR, 0x01)
+    await cpu_write(dut, ADDR_MICR, 0x01)
+
+    await fire_irq_edge(dut, 0x01)         # IRQ0, but masked
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+
+    ipr_val = await cpu_read(dut, ADDR_IPR)
+    assert ipr_val == 0x00, f"masked IRQ0 must never become pending, got IPR=0x{ipr_val:02X}"
+    assert slave.transaction_count() == 0, "masked IRQ0 must not trigger an APB txn"
+    assert int(dut.INT.value) == 0, "masked IRQ0 must not assert INT"
+
+    slave.stop()
+    mark_coverage("irq_masking")
+
+
+# ─────────────────────────────────────────────────────────────
+# T16: Level-triggered channel re-arms on its own; edge-triggered needs a fresh edge
+# ─────────────────────────────────────────────────────────────
+@cocotb.test()
+async def test_16_edge_level_trigger(dut):
+    cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
+    await reset_dut(dut)
+
+    await cpu_write(dut, ADDR_TRIG, 0xEF)   # channel 4 = level, rest = edge
+    await cpu_write(dut, ADDR_IMR, 0xEF)    # unmask channel 4 only
+    await cpu_write(dut, ADDR_GCR, 0x01)    # GIE=1, line mode
+
+    await RisingEdge(dut.clk)
+    dut.irq.value = 0x10                   # drive IRQ4 high and HOLD - no further edge ever
+
+    for _ in range(20):
+        await RisingEdge(dut.clk)
+        if int(dut.INT.value) == 1:
+            break
+    assert int(dut.INT.value) == 1, "level-triggered IRQ4 should assert INT"
+    assert int(dut.INT_VECT.value) == 4, f"expected vector 4, got {int(dut.INT_VECT.value)}"
+
+    await cpu_ack(dut)
+
+    # irq[4] is still held high with no new edge: a level-triggered source must re-arm on
+    # its own once the mask/ISR allow it (this can happen as soon as the very next clock,
+    # since ipr's bit4 has been continuously re-set by the held level the whole time). A
+    # trig_mode implementation stuck at edge-only would never see INT again here.
+    reasserted = False
+    for _ in range(20):
+        await RisingEdge(dut.clk)
+        if int(dut.INT.value) == 1:
+            reasserted = True
+            break
+    assert reasserted, "level-triggered IRQ4 held high should re-trigger without a new edge"
+
+    dut.irq.value = 0
+    await cpu_ack(dut)
+    mark_coverage("edge_level_trigger")
+
+
+# ─────────────────────────────────────────────────────────────
+# T17: A new IRQ pending in the same cycle as a CPU IPR W1C write is not dropped
+# ─────────────────────────────────────────────────────────────
+@cocotb.test()
+async def test_17_ipr_set_ack_race(dut):
+    cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
+    await reset_dut(dut)
+
+    await cpu_write(dut, ADDR_TRIG, 0xFF)
+    await cpu_write(dut, ADDR_IMR, 0xFC)   # unmask IRQ0 and IRQ1
+    await cpu_write(dut, ADDR_GCR, 0x00)   # GIE=0: keep IPR from being drained into ISR/APB
+
+    # Get IRQ0 pending first, so the CPU write below has something unrelated to W1C-clear.
+    await fire_irq_edge(dut, 0x01)
+    await RisingEdge(dut.clk)
+    ipr_before = await cpu_read(dut, ADDR_IPR)
+    assert ipr_before == 0x01, f"expected IRQ0 pending before the race, got 0x{ipr_before:02X}"
+
+    # Drive IRQ1 high (fresh edge) in the exact same cycle the CPU issues a W1C write to IPR
+    # that clears IRQ0's bit only - IRQ1's bit must still land in IPR despite the collision.
+    await RisingEdge(dut.clk)
+    dut.cpu_wr.value = 1
+    dut.cpu_rd.value = 0
+    dut.cpu_addr.value = ADDR_IPR
+    dut.cpu_wdata.value = 0x01              # W1C clears IRQ0 only
+    dut.irq.value = 0x02                    # IRQ1 rising edge lands on this same clock
+    await RisingEdge(dut.clk)
+    dut.cpu_wr.value = 0
+    dut.cpu_wdata.value = 0
+    dut.irq.value = 0
+
+    ipr_after = await cpu_read(dut, ADDR_IPR)
+    assert ipr_after == 0x02, \
+        f"IRQ1 pending in the same cycle as the IPR W1C write must survive, got 0x{ipr_after:02X}"
+
+    mark_coverage("ipr_set_ack_race")
+
+
+# ─────────────────────────────────────────────────────────────
+# T18: soft_reset asserts exactly one clock after apb_wait_cnt is observed at the documented
+# threshold (apb_wait_cnt registers the pre-increment count that the comparator used, so the
+# comparator's own "wait_cnt >= threshold" trip is only visible on the following sample -
+# see apb_wait_cnt in rtl/interrupt_controller.sv). Not one clock later, not one earlier.
+# ─────────────────────────────────────────────────────────────
+@cocotb.test()
+async def test_18_apb_threshold_boundary(dut):
+    cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
+    await reset_dut(dut)  # no slave coroutine -> PREADY never asserts
+
+    await cpu_write(dut, ADDR_TRIG, 0xFF)
+    await cpu_write(dut, ADDR_IMR, 0xFE)
+    await cpu_write(dut, ADDR_GCR, 0x01)
+    await cpu_write(dut, ADDR_MADDR_LO, 0x00)
+    await cpu_write(dut, ADDR_MADDR_HI, 0x00)
+    await cpu_write(dut, ADDR_MICR, 0x01)
+
+    await fire_irq_edge(dut, 0x01)
+
+    threshold = 500
+    boundary_seen = False
+    prev_wait_cnt = None
+    for _ in range(800):
+        await RisingEdge(dut.clk)
+        wait_cnt = int(dut.apb_wait_cnt.value)
+        soft = int(dut.soft_reset.value)
+        if prev_wait_cnt == threshold:
+            assert soft == 1, (
+                f"soft_reset must assert the clock after apb_wait_cnt is observed at "
+                f"{threshold} (prev apb_wait_cnt={prev_wait_cnt}, now={wait_cnt}, soft_reset=0)"
+            )
+            boundary_seen = True
+            break
+        if prev_wait_cnt is not None and prev_wait_cnt < threshold:
+            assert soft == 0, (
+                f"soft_reset asserted early (prev apb_wait_cnt={prev_wait_cnt} < {threshold})"
+            )
+        prev_wait_cnt = wait_cnt
+    assert boundary_seen, "apb_wait_cnt never reached the delayed-response threshold"
+
+    mark_coverage("apb_threshold_boundary")
