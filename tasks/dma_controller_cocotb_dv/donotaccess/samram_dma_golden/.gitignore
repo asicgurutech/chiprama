@@ -1,0 +1,14 @@
+.venv/
+build/
+__pycache__/
+*.vvp
+*.vcd
+*.fst
+*.log
+*.pyc
+.DS_Store
+*.tgz
+*.tar.gz
+*.zip
+results.xml
+sim_build/
