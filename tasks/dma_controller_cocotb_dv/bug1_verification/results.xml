@@ -1,0 +1,6 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1786547132" />
+    <testcase name="test_bug1_descriptor_sampled_at_arbitration" classname="test_bug1_desc_sampling" file="/media/sf_samram_dma/tb/test_bug1_desc_sampling.py" lineno="373" time="0.048322200775146484" sim_time_ns="1530.0" ratio_time="31662.465191091287" />
+  </testsuite>
+</testsuites>

@@ -1,0 +1,186 @@
+rm -f results.xml
+"make" -f Makefile results.xml
+make[1]: Entering directory '/media/sf_samram_dma'
+rm -f results.xml
+COCOTB_TEST_MODULES=test_bug1_desc_sampling COCOTB_TESTCASE= COCOTB_TEST_FILTER= COCOTB_TOPLEVEL=samram_dma_top TOPLEVEL_LANG=verilog \
+         /usr/bin/vvp -M /home/raza/vlsi_projects/dma_env/lib/python3.12/site-packages/cocotb/libs -m libcocotbvpi_icarus   sim_build/sim.vvp   
+     -.--ns INFO     gpi                                ..mbed/gpi_embed.cpp:93   in _embed_init_python              Using Python 3.12.4 interpreter at /home/raza/vlsi_projects/dma_env/bin/python
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:79   in gpi_print_registered_impl       VPI registered
+     0.00ns INFO     cocotb                             Running on Icarus Verilog version 12.0 (stable)
+     0.00ns INFO     cocotb                             Seeding Python random module with 1786547132
+     0.00ns INFO     cocotb                             Initialized cocotb v2.0.1 from /home/raza/vlsi_projects/dma_env/lib/python3.12/site-packages/cocotb
+     0.00ns INFO     cocotb.regression                  pytest not found, install it to enable better AssertionError messages
+     0.00ns INFO     cocotb                             Running tests
+     0.00ns INFO     cocotb.regression                  running test_bug1_desc_sampling.test_bug1_descriptor_sampled_at_arbitration (1/1)
+                                                            Bug #1 directed test.
+
+
+======================================================================
+BUG 1: DESCRIPTOR SAMPLING AT ARBITRATION
+======================================================================
+     0.00ns WARNING  py.warnings                        /media/sf_samram_dma/tb/test_bug1_desc_sampling.py:175: DeprecationWarning: The 'units' argument has been renamed to 'unit'.
+                                                          Clock(
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        AXI slave model (write)
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        cocotbext-axi version 0.1.28
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Copyright (c) 2021-2025 Alex Forencich
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        https://github.com/alexforencich/cocotbext-axi
+    60.00ns WARNING  py.warnings                        /home/raza/vlsi_projects/dma_env/lib/python3.12/site-packages/cocotbext/axi/stream.py:115: DeprecationWarning: Use `handle.set(Immediate(...))` or `handle.value = Immediate(...)` instead.
+                                                          self.ready.setimmediatevalue(self._ready_init)
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+    60.00ns WARNING  py.warnings                        /home/raza/vlsi_projects/dma_env/lib/python3.12/site-packages/cocotbext/axi/stream.py:120: DeprecationWarning: Use `handle.set(Immediate(...))` or `handle.value = Immediate(...)` instead.
+                                                          self.valid.setimmediatevalue(self._valid_init)
+    60.00ns WARNING  py.warnings                        /home/raza/vlsi_projects/dma_env/lib/python3.12/site-packages/cocotbext/axi/stream.py:133: DeprecationWarning: Use `handle.set(Immediate(...))` or `handle.value = Immediate(...)` instead.
+                                                          s.setimmediatevalue(v)
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        AXI slave model configuration:
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          Address width: 32 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          ID width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          Byte size: 8 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          Data width: 32 bits (4 bytes)
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        AXI slave model signals:
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awaddr width: 32 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awburst width: 2 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awcache width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awid width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awlen width: 8 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awlock width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awprot width: 3 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awqos width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awready width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awregion: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awsize width: 3 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awuser: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awvalid width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          wdata width: 32 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          wlast width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          wready width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          wstrb width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          wuser: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          wvalid width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          bid width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          bready width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          bresp width: 2 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          buser: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          bvalid width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        AXI slave model (read)
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        cocotbext-axi version 0.1.28
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Copyright (c) 2021-2025 Alex Forencich
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        https://github.com/alexforencich/cocotbext-axi
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        AXI slave model configuration:
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          Address width: 32 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          ID width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          Byte size: 8 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          Data width: 32 bits (4 bytes)
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        AXI slave model signals:
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          araddr width: 32 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arburst width: 2 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arcache width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arid width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arlen width: 8 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arlock width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arprot width: 3 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arqos width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arready width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arregion: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arsize width: 3 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          aruser: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arvalid width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          rdata width: 32 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          rid width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          rlast width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          rready width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          rresp width: 2 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          ruser: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          rvalid width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+
+Programming CH1 descriptor...
+    60.00ns WARNING  py.warnings                        /home/raza/vlsi_projects/dma_env/lib/python3.12/site-packages/cocotbext/axi/reset.py:59: DeprecationWarning: Use `signal.value_change` instead.
+                                                          await Edge(reset_signal)
+    80.00ns WARNING  py.warnings                        /media/sf_samram_dma/tb/test_bug1_desc_sampling.py:236: DeprecationWarning: The 'units' argument has been renamed to 'unit'.
+                                                          await Timer(1, units="ns")
+CH1 descriptor: SRC=0x00005000, DST=0x00008000, LEN=16
+
+Starting CH0...
+   310.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001000 arlen: 0 arsize: 2 arprot: 2
+   320.00ns WARNING  py.warnings                        /media/sf_samram_dma/tb/test_bug1_desc_sampling.py:292: DeprecationWarning: The 'units' argument has been renamed to 'unit'.
+                                                          await Timer(1, units="ns")
+CH0 is BUSY.
+
+Making CH1 descriptor pending...
+   340.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x00003000 awlen: 0 awsize: 2 awprot: 2
+   380.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001004 arlen: 0 arsize: 2 arprot: 2
+CH1 descriptor doorbell sent.
+CH1 is now pending.
+
+
+BUG WINDOW
+----------------------------------------------------------------------
+CH1 was programmed with LEN = 16
+CH1 is pending.
+Changing CH1 LEN from 16 -> 0 BEFORE arbitration...
+----------------------------------------------------------------------
+   390.00ns WARNING  py.warnings                        /media/sf_samram_dma/tb/test_bug1_desc_sampling.py:655: DeprecationWarning: The 'units' argument has been renamed to 'unit'.
+                                                          await Timer(
+   410.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x00003004 awlen: 0 awsize: 2 awprot: 2
+CH1 descriptor LEN is now 0.
+
+Waiting for CH0 to complete...
+   460.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001008 arlen: 0 arsize: 2 arprot: 2
+   490.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x00003008 awlen: 0 awsize: 2 awprot: 2
+   530.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x0000100c arlen: 0 arsize: 2 arprot: 2
+   560.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x0000300c awlen: 0 awsize: 2 awprot: 2
+   600.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001010 arlen: 0 arsize: 2 arprot: 2
+   630.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x00003010 awlen: 0 awsize: 2 awprot: 2
+   670.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001014 arlen: 0 arsize: 2 arprot: 2
+   700.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x00003014 awlen: 0 awsize: 2 awprot: 2
+   740.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001018 arlen: 0 arsize: 2 arprot: 2
+   770.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x00003018 awlen: 0 awsize: 2 awprot: 2
+   810.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x0000101c arlen: 0 arsize: 2 arprot: 2
+   840.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x0000301c awlen: 0 awsize: 2 awprot: 2
+   880.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001020 arlen: 0 arsize: 2 arprot: 2
+   910.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x00003020 awlen: 0 awsize: 2 awprot: 2
+   950.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001024 arlen: 0 arsize: 2 arprot: 2
+   980.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x00003024 awlen: 0 awsize: 2 awprot: 2
+  1020.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001028 arlen: 0 arsize: 2 arprot: 2
+  1050.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x00003028 awlen: 0 awsize: 2 awprot: 2
+  1090.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x0000102c arlen: 0 arsize: 2 arprot: 2
+  1120.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x0000302c awlen: 0 awsize: 2 awprot: 2
+  1160.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001030 arlen: 0 arsize: 2 arprot: 2
+  1190.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x00003030 awlen: 0 awsize: 2 awprot: 2
+  1230.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001034 arlen: 0 arsize: 2 arprot: 2
+  1260.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x00003034 awlen: 0 awsize: 2 awprot: 2
+  1300.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001038 arlen: 0 arsize: 2 arprot: 2
+  1330.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x00003038 awlen: 0 awsize: 2 awprot: 2
+  1370.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x0000103c arlen: 0 arsize: 2 arprot: 2
+  1400.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x0000303c awlen: 0 awsize: 2 awprot: 2
+CH0 completed.
+
+Waiting for CH1 ERROR...
+CH1 ERROR detected: STATUS=0x00000004
+
+
+======================================================================
+BUG 1 TEST PASSED
+======================================================================
+CH0 completed normally.
+CH1 became pending with LEN = 16.
+CH1 LEN changed to 0 before arbitration.
+CH1 sampled the current descriptor.
+CH1 correctly entered ERROR.
+CH1 did not execute the stale descriptor.
+CH1 destination remained unchanged.
+======================================================================
+  1530.00ns INFO     cocotb.regression                  test_bug1_desc_sampling.test_bug1_descriptor_sampled_at_arbitration passed
+  1530.00ns INFO     cocotb.regression                  *****************************************************************************************************************************
+                                                        ** TEST                                                                 STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+                                                        *****************************************************************************************************************************
+                                                        ** test_bug1_desc_sampling.test_bug1_descriptor_sampled_at_arbitration   PASS        1530.00           0.05      31662.47  **
+                                                        *****************************************************************************************************************************
+                                                        ** TESTS=1 PASS=1 FAIL=0 SKIP=0                                                      1530.00           0.05      29448.30  **
+                                                        *****************************************************************************************************************************
+make[1]: Leaving directory '/media/sf_samram_dma'
