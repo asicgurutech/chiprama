@@ -1,0 +1,6 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1786955596" />
+    <testcase name="test_bug2_boundary_address" classname="test_bug2_boundary_address" file="/media/sf_samram_dma/bug2_verification/tb/test_bug2_boundary_address.py" lineno="803" time="0.032735347747802734" sim_time_ns="350.0" ratio_time="10691.806383009716" />
+  </testsuite>
+</testsuites>

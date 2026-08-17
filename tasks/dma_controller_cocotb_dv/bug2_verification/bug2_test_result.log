@@ -1,0 +1,168 @@
+rm -f results.xml
+"make" -f Makefile results.xml
+make[1]: Entering directory '/media/sf_samram_dma/bug2_verification'
+rm -f results.xml
+COCOTB_TEST_MODULES=test_bug2_boundary_address COCOTB_TESTCASE= COCOTB_TEST_FILTER= COCOTB_TOPLEVEL=samram_dma_top TOPLEVEL_LANG=verilog \
+         /usr/bin/vvp -M /home/raza/vlsi_projects/dma_env/lib/python3.12/site-packages/cocotb/libs -m libcocotbvpi_icarus   sim_build/sim.vvp   
+     -.--ns INFO     gpi                                ..mbed/gpi_embed.cpp:93   in _embed_init_python              Using Python 3.12.4 interpreter at /home/raza/vlsi_projects/dma_env/bin/python
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:79   in gpi_print_registered_impl       VPI registered
+     0.00ns INFO     cocotb                             Running on Icarus Verilog version 12.0 (stable)
+     0.00ns INFO     cocotb                             Seeding Python random module with 1786955596
+     0.00ns INFO     cocotb                             Initialized cocotb v2.0.1 from /home/raza/vlsi_projects/dma_env/lib/python3.12/site-packages/cocotb
+     0.00ns INFO     cocotb.regression                  pytest not found, install it to enable better AssertionError messages
+     0.00ns INFO     cocotb                             Running tests
+     0.00ns INFO     cocotb.regression                  running test_bug2_boundary_address.test_bug2_boundary_address (1/1)
+
+======================================================================
+BUG #2: 32-BIT ADDRESS BOUNDARY TEST
+======================================================================
+
+============================================================
+CHECKER: Boundary calculation
+============================================================
+Start address : 0xFFFFFFFC
+Length        : 8 bytes
+End address   : 0x100000003
+Maximum legal : 0xFFFFFFFF
+Boundary violation: YES
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        AXI slave model (write)
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        cocotbext-axi version 0.1.28
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Copyright (c) 2021-2025 Alex Forencich
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        https://github.com/alexforencich/cocotbext-axi
+    60.00ns WARNING  py.warnings                        /home/raza/vlsi_projects/dma_env/lib/python3.12/site-packages/cocotbext/axi/stream.py:115: DeprecationWarning: Use `handle.set(Immediate(...))` or `handle.value = Immediate(...)` instead.
+                                                          self.ready.setimmediatevalue(self._ready_init)
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+    60.00ns WARNING  py.warnings                        /home/raza/vlsi_projects/dma_env/lib/python3.12/site-packages/cocotbext/axi/stream.py:120: DeprecationWarning: Use `handle.set(Immediate(...))` or `handle.value = Immediate(...)` instead.
+                                                          self.valid.setimmediatevalue(self._valid_init)
+    60.00ns WARNING  py.warnings                        /home/raza/vlsi_projects/dma_env/lib/python3.12/site-packages/cocotbext/axi/stream.py:133: DeprecationWarning: Use `handle.set(Immediate(...))` or `handle.value = Immediate(...)` instead.
+                                                          s.setimmediatevalue(v)
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        AXI slave model configuration:
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          Address width: 32 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          ID width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          Byte size: 8 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          Data width: 32 bits (4 bytes)
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        AXI slave model signals:
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awaddr width: 32 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awburst width: 2 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awcache width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awid width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awlen width: 8 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awlock width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awprot width: 3 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awqos width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awready width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awregion: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awsize width: 3 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awuser: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          awvalid width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          wdata width: 32 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          wlast width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          wready width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          wstrb width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          wuser: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          wvalid width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          bid width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          bready width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          bresp width: 2 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          buser: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          bvalid width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        AXI slave model (read)
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        cocotbext-axi version 0.1.28
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Copyright (c) 2021-2025 Alex Forencich
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        https://github.com/alexforencich/cocotbext-axi
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        AXI slave model configuration:
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          Address width: 32 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          ID width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          Byte size: 8 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          Data width: 32 bits (4 bytes)
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        AXI slave model signals:
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          araddr width: 32 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arburst width: 2 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arcache width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arid width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arlen width: 8 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arlock width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arprot width: 3 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arqos width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arready width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arregion: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arsize width: 3 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          aruser: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          arvalid width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          rdata width: 32 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          rid width: 4 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          rlast width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          rready width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          rresp width: 2 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          ruser: not present
+    60.00ns INFO     cocotb.samram_dma_top.m_axi          rvalid width: 1 bits
+    60.00ns INFO     cocotb.samram_dma_top.m_axi        Reset de-asserted
+
+SRC = 0x00001000
+DST = 0xFFFFFFFC
+LEN = 8
+
+Starting DMA...
+    60.00ns WARNING  py.warnings                        /home/raza/vlsi_projects/dma_env/lib/python3.12/site-packages/cocotbext/axi/reset.py:59: DeprecationWarning: Use `signal.value_change` instead.
+                                                          await Edge(reset_signal)
+CHECKER: AXI address observed = 0x00001000
+   190.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001000 arlen: 0 arsize: 2 arprot: 2
+CHECKER: AXI address observed = 0xFFFFFFFC
+   220.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0xfffffffc awlen: 0 awsize: 2 awprot: 2
+CHECKER: AXI address observed = 0x00001004
+   260.00ns INFO     cocotb.samram_dma_top.m_axi        Read burst arid: 0x0 araddr: 0x00001004 arlen: 0 arsize: 2 arprot: 2
+CHECKER: AXI address observed = 0x00000000
+   290.00ns INFO     cocotb.samram_dma_top.m_axi        Write burst awid: 0x0 awaddr: 0x00000000 awlen: 0 awsize: 2 awprot: 2
+
+CHECKER: DONE observed without ERROR status=0x00000002
+CHECKER: fatal_irq = 0
+
+============================================================
+CHECKER: Error termination check
+============================================================
+CHECKER: ERROR termination = NO
+
+======================================================================
+BUG #2 CHECKER RESULT
+======================================================================
+✓ Boundary violation detected.
+❌ DUT did not enter ERROR status.
+❌ DUT did not raise fatal_irq.
+❌ DUT did not terminate the transaction through ERROR/fatal_irq.
+
+Observed AXI addresses:
+  [0] 0x00001000
+  [1] 0xFFFFFFFC
+  [2] 0x00001004
+  [3] 0x00000000
+
+======================================================================
+❌ CHECKER FAILED
+
+BUG #2 CONFIRMED:
+The DUT violated the required address-boundary/error behavior.
+
+Failure details:
+  - DUT completed with DONE instead of entering ERROR.
+  - DUT did not raise fatal_irq.
+  - DUT did not terminate the transaction through the required ERROR/fatal_irq path.
+======================================================================
+
+======================================================================
+BUG #2 TESTBENCH PASSED
+The checker successfully detected the RTL boundary violation.
+======================================================================
+   350.00ns INFO     cocotb.regression                  test_bug2_boundary_address.test_bug2_boundary_address passed
+   350.00ns INFO     cocotb.regression                  ***************************************************************************************************************
+                                                        ** TEST                                                   STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+                                                        ***************************************************************************************************************
+                                                        ** test_bug2_boundary_address.test_bug2_boundary_address   PASS         350.00           0.03      10691.81  **
+                                                        ***************************************************************************************************************
+                                                        ** TESTS=1 PASS=1 FAIL=0 SKIP=0                                         350.00           0.04       9422.14  **
+                                                        ***************************************************************************************************************
+make[1]: Leaving directory '/media/sf_samram_dma/bug2_verification'
