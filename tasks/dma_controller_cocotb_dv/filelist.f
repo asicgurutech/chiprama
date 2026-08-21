@@ -1,0 +1,14 @@
++incdir+donotaccess/samram_dma_golden/rtl/golden/samram_dma/include
+    donotaccess/samram_dma_golden/rtl/golden/samram_dma/samram_dma_apb_decode.v 
+    donotaccess/samram_dma_golden/rtl/golden/samram_dma/samram_dma_csr_write_ctrl.v 
+    donotaccess/samram_dma_golden/rtl/golden/samram_dma/samram_dma_irq_ctrl.v 
+    donotaccess/samram_dma_golden/rtl/golden/samram_dma/samram_dma_desc_ring.v 
+    donotaccess/samram_dma_golden/rtl/golden/samram_dma/samram_dma_scheduler.v 
+    donotaccess/samram_dma_golden/rtl/golden/samram_dma/samram_dma_rr_arbiter.v 
+    donotaccess/samram_dma_golden/rtl/golden/samram_dma/samram_dma_desc_sram.v 
+    donotaccess/samram_dma_golden/rtl/golden/samram_dma/samram_dma_csr_read_mux.v 
+    donotaccess/samram_dma_golden/rtl/golden/samram_dma/samram_dma_align.v 
+    donotaccess/samram_dma_golden/rtl/golden/samram_dma/samram_dma_xfer_engine.v 
+    donotaccess/samram_dma_golden/rtl/golden/samram_dma/samram_dma_apb_resp_mux.v 
+    donotaccess/samram_dma_golden/rtl/golden/samram_dma/samram_dma_axi_master_out.v 
+    donotaccess/samram_dma_golden/rtl/golden/samram_dma/samram_dma_top.v
